@@ -25,6 +25,7 @@ export default class HomeScreen extends Component {
           <GameCard
             title='Juega con tu mente'
             source={require('./img/card2.jpg')}
+            onPress={() => this.props.navigator.push({ boxes: true })}
 
           />
           <GameCard

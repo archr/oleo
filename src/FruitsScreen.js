@@ -31,7 +31,8 @@ export default class FruitsScreen extends Component {
       points: padStart(0, 5, '0'),
       seconds: 30,
       finished: false,
-      hearts: []
+      hearts: [],
+      waiting: false
     }
 
     this.updateClock = this.updateClock.bind(this)
@@ -62,6 +63,8 @@ export default class FruitsScreen extends Component {
   }
 
   updateClock() {
+    if (this.state.waiting) return
+
     if (this.state.seconds === 0) {
       timer.clearInterval(this)
       this.props.navigator.push({
@@ -98,7 +101,7 @@ export default class FruitsScreen extends Component {
   }
 
   render() {
-    const { fruitIndex, isFruit, points, seconds, finished } = this.state
+    const { fruitIndex, isFruit, points, seconds, finished, waiting } = this.state
 
     return (
       <View style={styles.background}>
@@ -107,6 +110,12 @@ export default class FruitsScreen extends Component {
         <View style={styles.content}>
           <Text style={styles.points}>Puntos {points}</Text>
           <Text style={styles.seconds}>{seconds}</Text>
+          <Button
+            style={{ backgroundColor: waiting ? 'red' : '#23aeff', top: 40, right: 10, width: 60, position: 'absolute' }}
+            onPress={() => this.setState({ waiting: !waiting }) }
+            >
+            Ping
+          </Button>
 
           <Image
             style={styles.fruit}

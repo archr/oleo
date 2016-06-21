@@ -3,6 +3,8 @@ import { AppRegistry, StyleSheet, Text, View, Navigator, BackAndroid } from 'rea
 import HomeScreen from './src/HomeScreen'
 import FruitsScreen from './src/FruitsScreen'
 import ResultsScreen from './src/ResultsScreen'
+import BoxScreen from './src/BoxScreen'
+import OptionsBoxScreen from './src/OptionsBoxScreen'
 
 class Oleo extends Component {
 
@@ -42,6 +44,14 @@ class Oleo extends Component {
 
           if (route.results) {
             return <ResultsScreen {...route} navigator={navigator}/>
+          }
+
+          if (route.boxes) {
+            return <BoxScreen {...route} navigator={navigator} />
+          }
+
+          if (route.optionsBoxes) {
+            return <OptionsBoxScreen {...route} navigator={navigator} />
           }
 
           return <HomeScreen navigator={navigator}/>
