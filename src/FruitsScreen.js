@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import { View, Text, Image, StyleSheet, StatusBar, TouchableNativeFeedback } from 'react-native'
 import { padStart } from 'lodash'
 import Button from 'apsl-react-native-button'
+import timer from 'react-native-timer'
+import AnimatedHeart from './AnimatedHeart'
 
 const fruits = [
   { name: 'Platano', photo: require('./img/banana.png'), isFruit: true },
@@ -13,6 +15,11 @@ const fruits = [
   { name: 'Fresa', photo: require('./img/strawberry.png'), isFruit: true },
   { name: 'Sandia', photo: require('./img/watermelon.png'), isFruit: true }
 ]
+const startCount = 0
+
+function getRandomNumber(min, max) {
+  return Math.random() * (max - min) + min;
+}
 
 export default class FruitsScreen extends Component {
   constructor() {
@@ -21,8 +28,52 @@ export default class FruitsScreen extends Component {
     this.state = {
       isFruit: this.getRandomBoolean(),
       fruitIndex: this.getRandomFruit(),
-      points: padStart(0, 5, '0')
+      points: padStart(0, 5, '0'),
+      seconds: 30,
+      finished: false,
+      hearts: []
     }
+
+    this.updateClock = this.updateClock.bind(this)
+  }
+
+  addHeart(isGood) {
+    startCount += 1;
+    this.state.hearts.push({
+      id: startCount,
+      right: getRandomNumber(20, 50),
+      isGood: isGood
+    });
+    this.setState(this.state);
+  }
+
+  removeHeart(v) {
+    var index = this.state.hearts.findIndex(function(heart) { return heart.id === v});
+    this.state.hearts.splice(index, 1);
+    this.setState(this.state);
+  }
+
+  componentDidMount() {
+    timer.setInterval(this, 'interval', this.updateClock, 1000)
+  }
+
+  componentWillUnmount() {
+    timer.clearInterval(this)
+  }
+
+  updateClock() {
+    if (this.state.seconds === 0) {
+      timer.clearInterval(this)
+      this.props.navigator.push({
+        results: true,
+        points: this.state.points
+      })
+      return
+    }
+
+    this.setState({
+      seconds: this.state.seconds - 1
+    })
   }
 
   getRandomBoolean() {
@@ -38,6 +89,7 @@ export default class FruitsScreen extends Component {
     const points = parseInt(this.state.points)
     const newPoints = padStart(isValid ? (points + 100) : points, 5, '0')
 
+    this.addHeart(isValid)
     this.setState({
       isFruit: this.getRandomBoolean(),
       fruitIndex: this.getRandomFruit(),
@@ -46,7 +98,7 @@ export default class FruitsScreen extends Component {
   }
 
   render() {
-    const { fruitIndex, isFruit, points } = this.state
+    const { fruitIndex, isFruit, points, seconds, finished } = this.state
 
     return (
       <View style={styles.background}>
@@ -54,6 +106,7 @@ export default class FruitsScreen extends Component {
 
         <View style={styles.content}>
           <Text style={styles.points}>Puntos {points}</Text>
+          <Text style={styles.seconds}>{seconds}</Text>
 
           <Image
             style={styles.fruit}
@@ -77,6 +130,18 @@ export default class FruitsScreen extends Component {
             </Button>
           </View>
         </View>
+
+        <View style={styles.container}>
+          {this.state.hearts.map((v, i) =>
+            <AnimatedHeart
+              key={v.id}
+              onComplete={this.removeHeart.bind(this, v.id)}
+              style={{right: this.state.hearts[i].right}}
+              isGood={this.state.hearts[i].isGood}
+            />
+          )}
+        </View>
+
       </View>
     )
   }
@@ -125,8 +190,16 @@ const styles = StyleSheet.create({
     color: '#000',
     fontWeight: 'bold',
     position: 'absolute',
-    right: 0,
-    top: 0,
-    fontSize: 16
+    right: 4,
+    top: 4,
+    fontSize: 20
+  },
+  seconds: {
+    color: '#000',
+    fontWeight: 'bold',
+    position: 'absolute',
+    left: 4,
+    top: 4,
+    fontSize: 20
   }
 })

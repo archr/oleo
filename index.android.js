@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { AppRegistry, StyleSheet, Text, View, Navigator, BackAndroid } from 'react-native'
 import HomeScreen from './src/HomeScreen'
 import FruitsScreen from './src/FruitsScreen'
+import ResultsScreen from './src/ResultsScreen'
 
 class Oleo extends Component {
 
@@ -33,10 +34,14 @@ class Oleo extends Component {
     return (
       <Navigator
         ref={(navigator) => this.navigator = navigator}
-        initialRoute={{name: 'My First Scene', index: 0}}
+        initialRoute={{ home: true }}
         renderScene={(route, navigator) => {
           if (route.fruits) {
             return <FruitsScreen navigator={navigator}/>
+          }
+
+          if (route.results) {
+            return <ResultsScreen {...route} navigator={navigator}/>
           }
 
           return <HomeScreen navigator={navigator}/>
